@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager Desktop - OPTIMUM CREATIVE SOLUTIONS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
+        }
+
+        .content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .logo {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .company-name {
+            font-size: 1.5rem;
+            color: #667eea;
+            margin-bottom: 2rem;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .app-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .app-subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 3rem;
+            max-width: 600px;
+        }
+
+        .download-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .download-btn:hover::before {
+            left: 100%;
+        }
+
+        .features {
+            margin-top: 4rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px) scale(1.02);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            color: #ccc;
+            line-height: 1.6;
+        }
+
+        .stats {
+            margin-top: 3rem;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .interaction-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #667eea;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            z-index: 100;
+        }
+
+        @media (max-width: 768px) {
+            .logo { font-size: 2.5rem; }
+            .app-title { font-size: 2rem; }
+            .features { grid-template-columns: 1fr; }
+            .stats { flex-direction: column; }
+            .custom-cursor { display: none; }
+            body { cursor: auto; }
+        }
+    </style>
+</head>
+<body>
+    <div class="custom-cursor"></div>
+    <div id="canvas-container"></div>
+    
+    <div class="content">
+        <div class="logo">🚀</div>
+        <div class="company-name">OPTIMUM CREATIVE SOLUTIONS</div>
+        <h1 class="app-title">Task Manager Desktop</h1>
+        <p class="app-subtitle">
+            Professional desktop task management application with stunning 3D animations, 
+            smooth performance, and enterprise-grade features. Built for productivity.
+        </p>
+        
+        <a href="TaskManager-Installer.zip" class="download-btn" download>
+            📥 Download Now
+        </a>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">20KB</div>
+                <div class="stat-label">Lightweight</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">60fps</div>
+                <div class="stat-label">Smooth Animations</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">AES-256</div>
+                <div class="stat-label">Encrypted</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">Auto</div>
+                <div class="stat-label">Updates</div>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">🎯</div>
+                <div class="feature-title">Smart Task Management</div>
+                <div class="feature-desc">Create, edit, and organize tasks with intelligent prioritization and beautiful 3D animations.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">Enterprise Security</div>
+                <div class="feature-desc">AES-256 encryption, secure IPC, and comprehensive input validation for maximum protection.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🎨</div>
+                <div class="feature-title">Stunning UI/UX</div>
+                <div class="feature-desc">Modern design with smooth 60fps animations, dark/light themes, and responsive layout.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Lightning Fast</div>
+                <div class="feature-desc">Starts in under 1.5 seconds with optimized performance and minimal resource usage.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔄</div>
+                <div class="feature-title">Auto Updates</div>
+                <div class="feature-desc">Silent background updates with professional notifications and safe rollback protection.</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">💎</div>
+                <div class="feature-title">Professional Grade</div>
+                <div class="feature-desc">Commercial-quality software that rivals Todoist, Microsoft To-Do, and Any.do.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="interaction-hint">Move your mouse to interact with the 3D shapes!</div>
+
+    <script>
+        // Enhanced Three.js 3D Animation with Mouse Interaction
+        let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+        let raycaster, mouse;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x000000, 0);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Create various 3D shapes
+            particles = [];
+            
+            // Rocket shapes
+            for (let i = 0; i < 15; i++) {
+                const geometry = new THREE.ConeGeometry(0.5, 2, 8);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0xff6b6b, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const rocket = new THREE.Mesh(geometry, material);
+                rocket.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                rocket.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                rocket.scale.setScalar(Math.random() * 0.5 + 0.5);
+                rocket.userData = { type: 'rocket', originalColor: 0xff6b6b };
+                particles.push(rocket);
+                scene.add(rocket);
+            }
+
+            // Diamond shapes
+            for (let i = 0; i < 10; i++) {
+                const geometry = new THREE.OctahedronGeometry(1, 0);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x667eea, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const diamond = new THREE.Mesh(geometry, material);
+                diamond.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                diamond.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                diamond.scale.setScalar(Math.random() * 0.8 + 0.6);
+                diamond.userData = { type: 'diamond', originalColor: 0x667eea };
+                particles.push(diamond);
+                scene.add(diamond);
+            }
+
+            // Star shapes
+            for (let i = 0; i < 8; i++) {
+                const geometry = new THREE.TetrahedronGeometry(1, 0);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0xf093fb, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const star = new THREE.Mesh(geometry, material);
+                star.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                star.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                star.scale.setScalar(Math.random() * 0.6 + 0.4);
+                star.userData = { type: 'star', originalColor: 0xf093fb };
+                particles.push(star);
+                scene.add(star);
+            }
+
+            // Cube shapes
+            for (let i = 0; i < 12; i++) {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x4ecdc4, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const cube = new THREE.Mesh(geometry, material);
+                cube.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                cube.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                cube.scale.setScalar(Math.random() * 0.7 + 0.5);
+                cube.userData = { type: 'cube', originalColor: 0x4ecdc4 };
+                particles.push(cube);
+                scene.add(cube);
+            }
+
+            // Sphere shapes
+            for (let i = 0; i < 6; i++) {
+                const geometry = new THREE.SphereGeometry(1, 16, 16);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x45b7d1, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                sphere.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                sphere.scale.setScalar(Math.random() * 0.8 + 0.6);
+                sphere.userData = { type: 'sphere', originalColor: 0x45b7d1 };
+                particles.push(sphere);
+                scene.add(sphere);
+            }
+
+            camera.position.z = 10;
+            
+            // Setup raycaster for mouse interaction
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Update mouse position
+            mouse.x = (mouseX / window.innerWidth) * 2 - 1;
+            mouse.y = -(mouseY / window.innerHeight) * 2 + 1;
+
+            // Raycast to find objects under mouse
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(particles);
+
+            // Reset all particles
+            particles.forEach(particle => {
+                particle.material.color.setHex(particle.userData.originalColor);
+                particle.scale.setScalar(particle.scale.x * 0.99);
+            });
+
+            // Highlight intersected particles
+            intersects.forEach(intersect => {
+                const particle = intersect.object;
+                particle.material.color.setHex(0xffffff);
+                particle.scale.setScalar(particle.scale.x * 1.1);
+            });
+
+            // Animate particles
+            particles.forEach((particle, index) => {
+                particle.rotation.x += 0.01;
+                particle.rotation.y += 0.01;
+                
+                // Different movement patterns based on type
+                switch(particle.userData.type) {
+                    case 'rocket':
+                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.02;
+                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        break;
+                    case 'diamond':
+                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.015;
+                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.015;
+                        break;
+                    case 'star':
+                        particle.position.x += Math.sin(Date.now() * 0.001 + index) * 0.02;
+                        particle.position.z += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        break;
+                    case 'cube':
+                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.01;
+                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.015;
+                        break;
+                    case 'sphere':
+                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.02;
+                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        break;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Mouse movement
+        document.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            
+            // Update custom cursor
+            const cursor = document.querySelector('.custom-cursor');
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
+
+        // Initialize and start animation
+        init();
+        animate();
+        window.addEventListener('resize', onWindowResize);
+
+        // Add smooth scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe features for animation
+        document.querySelectorAll('.feature').forEach(feature => {
+            feature.style.opacity = '0';
+            feature.style.transform = 'translateY(30px)';
+            feature.style.transition = 'all 0.6s ease';
+            observer.observe(feature);
+        });
+
+        // Observe stats for animation
+        document.querySelectorAll('.stat').forEach(stat => {
+            stat.style.opacity = '0';
+            stat.style.transform = 'translateY(20px)';
+            stat.style.transition = 'all 0.6s ease';
+            observer.observe(stat);
+        });
+
+        // Add download button animation
+        const downloadBtn = document.querySelector('.download-btn');
+        downloadBtn.addEventListener('mouseenter', () => {
+            downloadBtn.style.transform = 'translateY(-3px) scale(1.05)';
+        });
+        downloadBtn.addEventListener('mouseleave', () => {
+            downloadBtn.style.transform = 'translateY(0) scale(1)';
+        });
+    </script>
+</body>
+</html> 
