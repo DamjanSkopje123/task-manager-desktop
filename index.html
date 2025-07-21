@@ -298,7 +298,7 @@
     <div class="interaction-hint">Move your mouse to interact with the 3D shapes!</div>
 
     <script>
-        // Enhanced Three.js 3D Animation with Better Objects
+        // Enhanced Three.js 3D Animation with Interactive Push Effect
         let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
         let raycaster, mouse;
 
@@ -334,7 +334,12 @@
                     Math.random() * Math.PI
                 );
                 torus.scale.setScalar(Math.random() * 0.8 + 0.6);
-                torus.userData = { type: 'torus', originalColor: 0xff8c00 };
+                torus.userData = { 
+                    type: 'torus', 
+                    originalColor: 0xff8c00,
+                    originalPosition: new THREE.Vector3().copy(torus.position),
+                    pushForce: 0
+                };
                 particles.push(torus);
                 scene.add(torus);
             }
@@ -360,7 +365,12 @@
                     Math.random() * Math.PI
                 );
                 dodecahedron.scale.setScalar(Math.random() * 0.7 + 0.5);
-                dodecahedron.userData = { type: 'dodecahedron', originalColor: 0xff4500 };
+                dodecahedron.userData = { 
+                    type: 'dodecahedron', 
+                    originalColor: 0xff4500,
+                    originalPosition: new THREE.Vector3().copy(dodecahedron.position),
+                    pushForce: 0
+                };
                 particles.push(dodecahedron);
                 scene.add(dodecahedron);
             }
@@ -386,7 +396,12 @@
                     Math.random() * Math.PI
                 );
                 icosahedron.scale.setScalar(Math.random() * 0.6 + 0.4);
-                icosahedron.userData = { type: 'icosahedron', originalColor: 0xff6347 };
+                icosahedron.userData = { 
+                    type: 'icosahedron', 
+                    originalColor: 0xff6347,
+                    originalPosition: new THREE.Vector3().copy(icosahedron.position),
+                    pushForce: 0
+                };
                 particles.push(icosahedron);
                 scene.add(icosahedron);
             }
@@ -412,7 +427,12 @@
                     Math.random() * Math.PI
                 );
                 cylinder.scale.setScalar(Math.random() * 0.8 + 0.6);
-                cylinder.userData = { type: 'cylinder', originalColor: 0xff7f50 };
+                cylinder.userData = { 
+                    type: 'cylinder', 
+                    originalColor: 0xff7f50,
+                    originalPosition: new THREE.Vector3().copy(cylinder.position),
+                    pushForce: 0
+                };
                 particles.push(cylinder);
                 scene.add(cylinder);
             }
@@ -438,7 +458,12 @@
                     Math.random() * Math.PI
                 );
                 ring.scale.setScalar(Math.random() * 0.7 + 0.5);
-                ring.userData = { type: 'ring', originalColor: 0xffa500 };
+                ring.userData = { 
+                    type: 'ring', 
+                    originalColor: 0xffa500,
+                    originalPosition: new THREE.Vector3().copy(ring.position),
+                    pushForce: 0
+                };
                 particles.push(ring);
                 scene.add(ring);
             }
@@ -457,19 +482,44 @@
             mouse.x = (mouseX / window.innerWidth) * 2 - 1;
             mouse.y = -(mouseY / window.innerHeight) * 2 + 1;
 
-            // Raycast to find objects under mouse
-            raycaster.setFromCamera(mouse, camera);
-            const intersects = raycaster.intersectObjects(particles);
+            // Convert mouse position to 3D world coordinates
+            const mouseVector = new THREE.Vector3(mouse.x * 10, mouse.y * 10, 0);
+            mouseVector.applyMatrix4(camera.matrixWorldInverse);
 
-            // Reset all particles (no zooming)
-            particles.forEach(particle => {
-                particle.material.color.setHex(particle.userData.originalColor);
-            });
-
-            // Highlight intersected particles (no scaling)
-            intersects.forEach(intersect => {
-                const particle = intersect.object;
-                particle.material.color.setHex(0xff4500);
+            // Interactive push effect
+            particles.forEach((particle, index) => {
+                // Calculate distance from mouse to particle
+                const distance = particle.position.distanceTo(mouseVector);
+                const maxDistance = 3; // Push radius
+                
+                if (distance < maxDistance) {
+                    // Calculate push direction (away from mouse)
+                    const pushDirection = new THREE.Vector3()
+                        .subVectors(particle.position, mouseVector)
+                        .normalize();
+                    
+                    // Calculate push force (stronger when closer)
+                    const pushForce = (maxDistance - distance) / maxDistance;
+                    particle.userData.pushForce = pushForce;
+                    
+                    // Apply push effect
+                    const pushOffset = pushDirection.multiplyScalar(pushForce * 2);
+                    particle.position.copy(particle.userData.originalPosition).add(pushOffset);
+                    
+                    // Change color based on push force
+                    const intensity = Math.floor(pushForce * 255);
+                    particle.material.color.setHex(0xff0000 + intensity * 0x000100);
+                } else {
+                    // Gradually return to original position
+                    particle.userData.pushForce *= 0.95;
+                    const returnDirection = new THREE.Vector3()
+                        .subVectors(particle.userData.originalPosition, particle.position)
+                        .multiplyScalar(0.1);
+                    particle.position.add(returnDirection);
+                    
+                    // Return to original color
+                    particle.material.color.setHex(particle.userData.originalColor);
+                }
             });
 
             // Animate particles with better movement
@@ -477,27 +527,32 @@
                 particle.rotation.x += 0.005;
                 particle.rotation.y += 0.005;
                 
+                // Update original position for natural movement
+                particle.userData.originalPosition.x += Math.sin(Date.now() * 0.001 + index) * 0.01;
+                particle.userData.originalPosition.y += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                particle.userData.originalPosition.z += Math.sin(Date.now() * 0.001 + index * 0.5) * 0.01;
+                
                 // Different movement patterns based on type
                 switch(particle.userData.type) {
                     case 'torus':
-                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.015;
-                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        particle.userData.originalPosition.y += Math.sin(Date.now() * 0.001 + index) * 0.015;
+                        particle.userData.originalPosition.x += Math.cos(Date.now() * 0.001 + index) * 0.01;
                         break;
                     case 'dodecahedron':
-                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.012;
-                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.012;
+                        particle.userData.originalPosition.y += Math.cos(Date.now() * 0.001 + index) * 0.012;
+                        particle.userData.originalPosition.z += Math.sin(Date.now() * 0.001 + index) * 0.012;
                         break;
                     case 'icosahedron':
-                        particle.position.x += Math.sin(Date.now() * 0.001 + index) * 0.018;
-                        particle.position.z += Math.cos(Date.now() * 0.001 + index) * 0.008;
+                        particle.userData.originalPosition.x += Math.sin(Date.now() * 0.001 + index) * 0.018;
+                        particle.userData.originalPosition.z += Math.cos(Date.now() * 0.001 + index) * 0.008;
                         break;
                     case 'cylinder':
-                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.008;
-                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.012;
+                        particle.userData.originalPosition.y += Math.sin(Date.now() * 0.001 + index) * 0.008;
+                        particle.userData.originalPosition.x += Math.cos(Date.now() * 0.001 + index) * 0.012;
                         break;
                     case 'ring':
-                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.015;
-                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.008;
+                        particle.userData.originalPosition.z += Math.sin(Date.now() * 0.001 + index) * 0.015;
+                        particle.userData.originalPosition.y += Math.cos(Date.now() * 0.001 + index) * 0.008;
                         break;
                 }
             });
