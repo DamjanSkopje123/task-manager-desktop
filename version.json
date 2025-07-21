@@ -1,0 +1,7 @@
+{
+  "version": "1.0.0",
+  "downloadUrl": "https://damjanskopje123.github.io/task-manager-desktop/TaskManager-Installer.zip",
+  "releaseNotes": "Initial release with professional features",
+  "minVersion": "1.0.0",
+  "forceUpdate": false
+}
