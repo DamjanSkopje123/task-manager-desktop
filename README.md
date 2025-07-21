@@ -17,6 +17,7 @@
             background: #0a0a0a;
             color: white;
             overflow-x: hidden;
+            cursor: none;
         }
 
         #canvas-container {
@@ -26,6 +27,18 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+        }
+
+        .custom-cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1000;
+            mix-blend-mode: difference;
+            transition: transform 0.1s ease;
         }
 
         .content {
@@ -90,10 +103,11 @@
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .download-btn:hover {
-            transform: translateY(-3px);
+            transform: translateY(-3px) scale(1.05);
             box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
         }
 
@@ -128,11 +142,13 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
         .feature:hover {
-            transform: translateY(-5px);
+            transform: translateY(-5px) scale(1.02);
             background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
         }
 
         .feature-icon {
@@ -151,31 +167,6 @@
             line-height: 1.6;
         }
 
-        .floating-shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.1;
-            animation: float 6s ease-in-out infinite;
-        }
-
-        .shape:nth-child(1) { animation-delay: 0s; }
-        .shape:nth-child(2) { animation-delay: 2s; }
-        .shape:nth-child(3) { animation-delay: 4s; }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(180deg); }
-        }
-
         .stats {
             margin-top: 3rem;
             display: flex;
@@ -187,6 +178,15 @@
         .stat {
             text-align: center;
             padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .stat-number {
@@ -200,24 +200,31 @@
             font-size: 0.9rem;
         }
 
+        .interaction-hint {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #667eea;
+            font-size: 0.9rem;
+            opacity: 0.7;
+            z-index: 100;
+        }
+
         @media (max-width: 768px) {
             .logo { font-size: 2.5rem; }
             .app-title { font-size: 2rem; }
             .features { grid-template-columns: 1fr; }
             .stats { flex-direction: column; }
+            .custom-cursor { display: none; }
+            body { cursor: auto; }
         }
     </style>
 </head>
 <body>
+    <div class="custom-cursor"></div>
     <div id="canvas-container"></div>
     
-    <div class="floating-shapes">
-        <div class="shape" style="top: 10%; left: 10%; font-size: 3rem;">🚀</div>
-        <div class="shape" style="top: 20%; right: 15%; font-size: 2.5rem;">✨</div>
-        <div class="shape" style="bottom: 30%; left: 20%; font-size: 2rem;">🎯</div>
-        <div class="shape" style="bottom: 20%; right: 10%; font-size: 2.5rem;">💎</div>
-    </div>
-
     <div class="content">
         <div class="logo">🚀</div>
         <div class="company-name">OPTIMUM CREATIVE SOLUTIONS</div>
@@ -284,9 +291,12 @@
         </div>
     </div>
 
+    <div class="interaction-hint">Move your mouse to interact with the 3D shapes!</div>
+
     <script>
-        // Three.js 3D Animation
-        let scene, camera, renderer, particles;
+        // Enhanced Three.js 3D Animation with Mouse Interaction
+        let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
+        let raycaster, mouse;
 
         function init() {
             scene = new THREE.Scene();
@@ -296,45 +306,198 @@
             renderer.setClearColor(0x000000, 0);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // Create floating geometric shapes
-            const geometry = new THREE.IcosahedronGeometry(1, 0);
-            const material = new THREE.MeshBasicMaterial({ 
-                color: 0x667eea, 
-                wireframe: true,
-                transparent: true,
-                opacity: 0.3
-            });
-
+            // Create various 3D shapes
             particles = [];
-            for (let i = 0; i < 50; i++) {
-                const particle = new THREE.Mesh(geometry, material);
-                particle.position.set(
+            
+            // Rocket shapes
+            for (let i = 0; i < 15; i++) {
+                const geometry = new THREE.ConeGeometry(0.5, 2, 8);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0xff6b6b, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const rocket = new THREE.Mesh(geometry, material);
+                rocket.position.set(
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20
                 );
-                particle.rotation.set(
+                rocket.rotation.set(
                     Math.random() * Math.PI,
                     Math.random() * Math.PI,
                     Math.random() * Math.PI
                 );
-                particle.scale.setScalar(Math.random() * 0.5 + 0.5);
-                particles.push(particle);
-                scene.add(particle);
+                rocket.scale.setScalar(Math.random() * 0.5 + 0.5);
+                rocket.userData = { type: 'rocket', originalColor: 0xff6b6b };
+                particles.push(rocket);
+                scene.add(rocket);
+            }
+
+            // Diamond shapes
+            for (let i = 0; i < 10; i++) {
+                const geometry = new THREE.OctahedronGeometry(1, 0);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x667eea, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const diamond = new THREE.Mesh(geometry, material);
+                diamond.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                diamond.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                diamond.scale.setScalar(Math.random() * 0.8 + 0.6);
+                diamond.userData = { type: 'diamond', originalColor: 0x667eea };
+                particles.push(diamond);
+                scene.add(diamond);
+            }
+
+            // Star shapes
+            for (let i = 0; i < 8; i++) {
+                const geometry = new THREE.TetrahedronGeometry(1, 0);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0xf093fb, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const star = new THREE.Mesh(geometry, material);
+                star.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                star.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                star.scale.setScalar(Math.random() * 0.6 + 0.4);
+                star.userData = { type: 'star', originalColor: 0xf093fb };
+                particles.push(star);
+                scene.add(star);
+            }
+
+            // Cube shapes
+            for (let i = 0; i < 12; i++) {
+                const geometry = new THREE.BoxGeometry(1, 1, 1);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x4ecdc4, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const cube = new THREE.Mesh(geometry, material);
+                cube.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                cube.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                cube.scale.setScalar(Math.random() * 0.7 + 0.5);
+                cube.userData = { type: 'cube', originalColor: 0x4ecdc4 };
+                particles.push(cube);
+                scene.add(cube);
+            }
+
+            // Sphere shapes
+            for (let i = 0; i < 6; i++) {
+                const geometry = new THREE.SphereGeometry(1, 16, 16);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0x45b7d1, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const sphere = new THREE.Mesh(geometry, material);
+                sphere.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                sphere.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                sphere.scale.setScalar(Math.random() * 0.8 + 0.6);
+                sphere.userData = { type: 'sphere', originalColor: 0x45b7d1 };
+                particles.push(sphere);
+                scene.add(sphere);
             }
 
             camera.position.z = 10;
+            
+            // Setup raycaster for mouse interaction
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
         }
 
         function animate() {
             requestAnimationFrame(animate);
 
-            // Rotate particles
+            // Update mouse position
+            mouse.x = (mouseX / window.innerWidth) * 2 - 1;
+            mouse.y = -(mouseY / window.innerHeight) * 2 + 1;
+
+            // Raycast to find objects under mouse
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(particles);
+
+            // Reset all particles
+            particles.forEach(particle => {
+                particle.material.color.setHex(particle.userData.originalColor);
+                particle.scale.setScalar(particle.scale.x * 0.99);
+            });
+
+            // Highlight intersected particles
+            intersects.forEach(intersect => {
+                const particle = intersect.object;
+                particle.material.color.setHex(0xffffff);
+                particle.scale.setScalar(particle.scale.x * 1.1);
+            });
+
+            // Animate particles
             particles.forEach((particle, index) => {
                 particle.rotation.x += 0.01;
                 particle.rotation.y += 0.01;
-                particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.01;
-                particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                
+                // Different movement patterns based on type
+                switch(particle.userData.type) {
+                    case 'rocket':
+                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.02;
+                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        break;
+                    case 'diamond':
+                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.015;
+                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.015;
+                        break;
+                    case 'star':
+                        particle.position.x += Math.sin(Date.now() * 0.001 + index) * 0.02;
+                        particle.position.z += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        break;
+                    case 'cube':
+                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.01;
+                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.015;
+                        break;
+                    case 'sphere':
+                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.02;
+                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        break;
+                }
             });
 
             renderer.render(scene, camera);
@@ -345,6 +508,17 @@
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         }
+
+        // Mouse movement
+        document.addEventListener('mousemove', (event) => {
+            mouseX = event.clientX;
+            mouseY = event.clientY;
+            
+            // Update custom cursor
+            const cursor = document.querySelector('.custom-cursor');
+            cursor.style.left = mouseX + 'px';
+            cursor.style.top = mouseY + 'px';
+        });
 
         // Initialize and start animation
         init();
@@ -372,6 +546,14 @@
             feature.style.transform = 'translateY(30px)';
             feature.style.transition = 'all 0.6s ease';
             observer.observe(feature);
+        });
+
+        // Observe stats for animation
+        document.querySelectorAll('.stat').forEach(stat => {
+            stat.style.opacity = '0';
+            stat.style.transform = 'translateY(20px)';
+            stat.style.transition = 'all 0.6s ease';
+            observer.observe(stat);
         });
 
         // Add download button animation
