@@ -14,8 +14,8 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #0a0a0a;
-            color: white;
+            background: linear-gradient(135deg, #ffffff 0%, #fff5e6 50%, #ffd700 100%);
+            color: #333;
             overflow-x: hidden;
             cursor: none;
         }
@@ -33,7 +33,7 @@
             position: fixed;
             width: 20px;
             height: 20px;
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #ff8c00, #ff4500);
             border-radius: 50%;
             pointer-events: none;
             z-index: 1000;
@@ -57,7 +57,7 @@
             font-size: 4rem;
             font-weight: bold;
             margin-bottom: 1rem;
-            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background: linear-gradient(45deg, #ff8c00, #ff4500, #ff6347, #ff7f50);
             background-size: 400% 400%;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -72,7 +72,7 @@
 
         .company-name {
             font-size: 1.5rem;
-            color: #667eea;
+            color: #ff8c00;
             margin-bottom: 2rem;
             font-weight: 300;
             letter-spacing: 2px;
@@ -82,17 +82,18 @@
             font-size: 3rem;
             margin-bottom: 1rem;
             font-weight: 700;
+            color: #333;
         }
 
         .app-subtitle {
             font-size: 1.2rem;
-            color: #ccc;
+            color: #666;
             margin-bottom: 3rem;
             max-width: 600px;
         }
 
         .download-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+            background: linear-gradient(45deg, #ff8c00, #ff4500);
             color: white;
             padding: 20px 40px;
             text-decoration: none;
@@ -100,7 +101,7 @@
             font-size: 1.3rem;
             font-weight: 600;
             transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
             position: relative;
             overflow: hidden;
             cursor: pointer;
@@ -108,7 +109,7 @@
 
         .download-btn:hover {
             transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 15px 40px rgba(255, 140, 0, 0.4);
         }
 
         .download-btn::before {
@@ -136,19 +137,20 @@
         }
 
         .feature {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             padding: 2rem;
             border-radius: 20px;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 140, 0, 0.2);
             transition: all 0.3s ease;
             cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .feature:hover {
             transform: translateY(-5px) scale(1.02);
-            background: rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 40px rgba(255, 140, 0, 0.2);
         }
 
         .feature-icon {
@@ -160,10 +162,11 @@
             font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            color: #333;
         }
 
         .feature-desc {
-            color: #ccc;
+            color: #666;
             line-height: 1.6;
         }
 
@@ -178,25 +181,26 @@
         .stat {
             text-align: center;
             padding: 1rem;
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.8);
             border-radius: 15px;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .stat:hover {
             transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
         }
 
         .stat-number {
             font-size: 2rem;
             font-weight: bold;
-            color: #667eea;
+            color: #ff8c00;
         }
 
         .stat-label {
-            color: #ccc;
+            color: #666;
             font-size: 0.9rem;
         }
 
@@ -205,7 +209,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            color: #667eea;
+            color: #ff8c00;
             font-size: 0.9rem;
             opacity: 0.7;
             z-index: 100;
@@ -234,7 +238,7 @@
             smooth performance, and enterprise-grade features. Built for productivity.
         </p>
         
-        <a href="TaskManager-Installer.zip" class="download-btn" download>
+        <a href="TaskManager-Lightweight-Professional-Installer.zip" class="download-btn" download>
             📥 Download Now
         </a>
 
@@ -294,7 +298,7 @@
     <div class="interaction-hint">Move your mouse to interact with the 3D shapes!</div>
 
     <script>
-        // Enhanced Three.js 3D Animation with Mouse Interaction
+        // Enhanced Three.js 3D Animation with Better Objects
         let scene, camera, renderer, particles, mouseX = 0, mouseY = 0;
         let raycaster, mouse;
 
@@ -303,140 +307,140 @@
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setClearColor(0x000000, 0);
+            renderer.setClearColor(0xffffff, 0);
             document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-            // Create various 3D shapes
+            // Create various 3D shapes with better designs
             particles = [];
             
-            // Rocket shapes
-            for (let i = 0; i < 15; i++) {
-                const geometry = new THREE.ConeGeometry(0.5, 2, 8);
-                const material = new THREE.MeshBasicMaterial({ 
-                    color: 0xff6b6b, 
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.4
-                });
-                const rocket = new THREE.Mesh(geometry, material);
-                rocket.position.set(
-                    (Math.random() - 0.5) * 20,
-                    (Math.random() - 0.5) * 20,
-                    (Math.random() - 0.5) * 20
-                );
-                rocket.rotation.set(
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI
-                );
-                rocket.scale.setScalar(Math.random() * 0.5 + 0.5);
-                rocket.userData = { type: 'rocket', originalColor: 0xff6b6b };
-                particles.push(rocket);
-                scene.add(rocket);
-            }
-
-            // Diamond shapes
-            for (let i = 0; i < 10; i++) {
-                const geometry = new THREE.OctahedronGeometry(1, 0);
-                const material = new THREE.MeshBasicMaterial({ 
-                    color: 0x667eea, 
-                    wireframe: true,
-                    transparent: true,
-                    opacity: 0.3
-                });
-                const diamond = new THREE.Mesh(geometry, material);
-                diamond.position.set(
-                    (Math.random() - 0.5) * 20,
-                    (Math.random() - 0.5) * 20,
-                    (Math.random() - 0.5) * 20
-                );
-                diamond.rotation.set(
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI,
-                    Math.random() * Math.PI
-                );
-                diamond.scale.setScalar(Math.random() * 0.8 + 0.6);
-                diamond.userData = { type: 'diamond', originalColor: 0x667eea };
-                particles.push(diamond);
-                scene.add(diamond);
-            }
-
-            // Star shapes
+            // Torus shapes (donuts)
             for (let i = 0; i < 8; i++) {
-                const geometry = new THREE.TetrahedronGeometry(1, 0);
+                const geometry = new THREE.TorusGeometry(1, 0.3, 8, 16);
                 const material = new THREE.MeshBasicMaterial({ 
-                    color: 0xf093fb, 
+                    color: 0xff8c00, 
                     wireframe: true,
                     transparent: true,
                     opacity: 0.4
                 });
-                const star = new THREE.Mesh(geometry, material);
-                star.position.set(
+                const torus = new THREE.Mesh(geometry, material);
+                torus.position.set(
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20
                 );
-                star.rotation.set(
+                torus.rotation.set(
                     Math.random() * Math.PI,
                     Math.random() * Math.PI,
                     Math.random() * Math.PI
                 );
-                star.scale.setScalar(Math.random() * 0.6 + 0.4);
-                star.userData = { type: 'star', originalColor: 0xf093fb };
-                particles.push(star);
-                scene.add(star);
+                torus.scale.setScalar(Math.random() * 0.8 + 0.6);
+                torus.userData = { type: 'torus', originalColor: 0xff8c00 };
+                particles.push(torus);
+                scene.add(torus);
             }
 
-            // Cube shapes
-            for (let i = 0; i < 12; i++) {
-                const geometry = new THREE.BoxGeometry(1, 1, 1);
+            // Dodecahedron shapes (12-sided)
+            for (let i = 0; i < 6; i++) {
+                const geometry = new THREE.DodecahedronGeometry(1, 0);
                 const material = new THREE.MeshBasicMaterial({ 
-                    color: 0x4ecdc4, 
+                    color: 0xff4500, 
                     wireframe: true,
                     transparent: true,
                     opacity: 0.3
                 });
-                const cube = new THREE.Mesh(geometry, material);
-                cube.position.set(
+                const dodecahedron = new THREE.Mesh(geometry, material);
+                dodecahedron.position.set(
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20
                 );
-                cube.rotation.set(
+                dodecahedron.rotation.set(
                     Math.random() * Math.PI,
                     Math.random() * Math.PI,
                     Math.random() * Math.PI
                 );
-                cube.scale.setScalar(Math.random() * 0.7 + 0.5);
-                cube.userData = { type: 'cube', originalColor: 0x4ecdc4 };
-                particles.push(cube);
-                scene.add(cube);
+                dodecahedron.scale.setScalar(Math.random() * 0.7 + 0.5);
+                dodecahedron.userData = { type: 'dodecahedron', originalColor: 0xff4500 };
+                particles.push(dodecahedron);
+                scene.add(dodecahedron);
             }
 
-            // Sphere shapes
-            for (let i = 0; i < 6; i++) {
-                const geometry = new THREE.SphereGeometry(1, 16, 16);
+            // Icosahedron shapes (20-sided)
+            for (let i = 0; i < 5; i++) {
+                const geometry = new THREE.IcosahedronGeometry(1, 0);
                 const material = new THREE.MeshBasicMaterial({ 
-                    color: 0x45b7d1, 
+                    color: 0xff6347, 
                     wireframe: true,
                     transparent: true,
                     opacity: 0.4
                 });
-                const sphere = new THREE.Mesh(geometry, material);
-                sphere.position.set(
+                const icosahedron = new THREE.Mesh(geometry, material);
+                icosahedron.position.set(
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20,
                     (Math.random() - 0.5) * 20
                 );
-                sphere.rotation.set(
+                icosahedron.rotation.set(
                     Math.random() * Math.PI,
                     Math.random() * Math.PI,
                     Math.random() * Math.PI
                 );
-                sphere.scale.setScalar(Math.random() * 0.8 + 0.6);
-                sphere.userData = { type: 'sphere', originalColor: 0x45b7d1 };
-                particles.push(sphere);
-                scene.add(sphere);
+                icosahedron.scale.setScalar(Math.random() * 0.6 + 0.4);
+                icosahedron.userData = { type: 'icosahedron', originalColor: 0xff6347 };
+                particles.push(icosahedron);
+                scene.add(icosahedron);
+            }
+
+            // Cylinder shapes
+            for (let i = 0; i < 10; i++) {
+                const geometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 8);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0xff7f50, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const cylinder = new THREE.Mesh(geometry, material);
+                cylinder.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                cylinder.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                cylinder.scale.setScalar(Math.random() * 0.8 + 0.6);
+                cylinder.userData = { type: 'cylinder', originalColor: 0xff7f50 };
+                particles.push(cylinder);
+                scene.add(cylinder);
+            }
+
+            // Ring shapes
+            for (let i = 0; i < 7; i++) {
+                const geometry = new THREE.RingGeometry(0.5, 1, 8);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: 0xffa500, 
+                    wireframe: true,
+                    transparent: true,
+                    opacity: 0.4
+                });
+                const ring = new THREE.Mesh(geometry, material);
+                ring.position.set(
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20,
+                    (Math.random() - 0.5) * 20
+                );
+                ring.rotation.set(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI
+                );
+                ring.scale.setScalar(Math.random() * 0.7 + 0.5);
+                ring.userData = { type: 'ring', originalColor: 0xffa500 };
+                particles.push(ring);
+                scene.add(ring);
             }
 
             camera.position.z = 10;
@@ -457,45 +461,43 @@
             raycaster.setFromCamera(mouse, camera);
             const intersects = raycaster.intersectObjects(particles);
 
-            // Reset all particles
+            // Reset all particles (no zooming)
             particles.forEach(particle => {
                 particle.material.color.setHex(particle.userData.originalColor);
-                particle.scale.setScalar(particle.scale.x * 0.99);
             });
 
-            // Highlight intersected particles
+            // Highlight intersected particles (no scaling)
             intersects.forEach(intersect => {
                 const particle = intersect.object;
-                particle.material.color.setHex(0xffffff);
-                particle.scale.setScalar(particle.scale.x * 1.1);
+                particle.material.color.setHex(0xff4500);
             });
 
-            // Animate particles
+            // Animate particles with better movement
             particles.forEach((particle, index) => {
-                particle.rotation.x += 0.01;
-                particle.rotation.y += 0.01;
+                particle.rotation.x += 0.005;
+                particle.rotation.y += 0.005;
                 
                 // Different movement patterns based on type
                 switch(particle.userData.type) {
-                    case 'rocket':
-                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.02;
+                    case 'torus':
+                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.015;
                         particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.01;
                         break;
-                    case 'diamond':
-                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.015;
+                    case 'dodecahedron':
+                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.012;
+                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.012;
+                        break;
+                    case 'icosahedron':
+                        particle.position.x += Math.sin(Date.now() * 0.001 + index) * 0.018;
+                        particle.position.z += Math.cos(Date.now() * 0.001 + index) * 0.008;
+                        break;
+                    case 'cylinder':
+                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.008;
+                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.012;
+                        break;
+                    case 'ring':
                         particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.015;
-                        break;
-                    case 'star':
-                        particle.position.x += Math.sin(Date.now() * 0.001 + index) * 0.02;
-                        particle.position.z += Math.cos(Date.now() * 0.001 + index) * 0.01;
-                        break;
-                    case 'cube':
-                        particle.position.y += Math.sin(Date.now() * 0.001 + index) * 0.01;
-                        particle.position.x += Math.cos(Date.now() * 0.001 + index) * 0.015;
-                        break;
-                    case 'sphere':
-                        particle.position.z += Math.sin(Date.now() * 0.001 + index) * 0.02;
-                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.01;
+                        particle.position.y += Math.cos(Date.now() * 0.001 + index) * 0.008;
                         break;
                 }
             });
